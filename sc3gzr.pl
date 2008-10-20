@@ -352,17 +352,34 @@ while(1){
 			if($e->axis == 1){ # analog stick 0 (left stick) vertical
 				if($e->axisValue == -32767){
 					print "STICK0 UP\n";
-				}elsif($e->axisValue == 0){
+				}elsif($e->axisValue == 32767){
 					print "STICK0 DOWN\n";
 				}
 			}
-			if($e->axis == 0){
+			if($e->axis == 0){ # analog stick 0 (left stick) horizontal
 				if($e->axisValue == -32767){
 					print "STICK0 LEFT\n";
 				}elsif($e->axisValue == 32767){
 					print "STICK0 RIGHT\n";
 				}
 			}
+
+			if($e->axis == 4){ # analog stick 1 (right stick) vertical
+				if($e->axisValue == -32767){
+					print "STICK1 UP\n";
+				}elsif($e->axisValue == 32767){
+					print "STICK1 DOWN\n";
+				}
+			}
+			if($e->axis == 3){ # analog stick 1 (right stick) horizontal
+				if($e->axisValue == 32767){
+					print "STICK1 RIGHT\n";
+				}elsif($e->axisValue == -32767){
+					print "STICK1 LEFT\n";
+				}
+			}
+
+			print $e->axisValue . "\n";
 		}
 			
 	}
