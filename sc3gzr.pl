@@ -379,7 +379,12 @@ while(1){
 				}
 			}
 
-			print $e->axisValue . "\n";
+			if($e->axis == 2){ # slider
+				print "SLIDER VAL " . $e->axisValue . "\n";
+			}
+
+			#print $e->axisValue . "\n";
+			#print $e->axis . "\n";
 		}
 			
 	}
