@@ -228,11 +228,11 @@ my @pattern_data = (
 #### Array of hashes for tracking stick positions ####
 
 my @stick_tracker = (
-        # Stick 0 (direction pad)
+        # 0: Stick 0 (direction pad)
         { u => 0, r => 0, d => 0, l => 0 },
-        # Stick 1 (left analog stick)
+        # 1: Stick 0 (left analog stick)
         { u => 0, r => 0, d => 0, l => 0 },
-        # Stick 2 (right analog stick)
+        # 2: Stick 1 (right analog stick)
         { u => 0, r => 0, d => 0, l => 0 }
 );
 
@@ -278,6 +278,21 @@ sub file2lines {
 	return @lines;
 }
 
+sub get_stick_direction {
+	# 0 = dpad, 1 = left analog, 2 = right analog
+	my $stick_num = shift;
+	
+	# Check diaganols first
+	if($stick_tracker[$stick_num]->{u} && $stick_tracker[$stick_num]->{r}){ return 'ur' }
+	elsif($stick_tracker[$stick_num]->{d} && $stick_tracker[$stick_num]->{r}){ return 'dr' }
+	elsif($stick_tracker[$stick_num]->{d} && $stick_tracker[$stick_num]->{l}){ return 'dl' }
+	elsif($stick_tracker[$stick_num]->{u} && $stick_tracker[$stick_num]->{l}){ return 'ul' }
+	elsif($stick_tracker[$stick_num]->{u}){ return 'u' }
+	elsif($stick_tracker[$stick_num]->{r}){ return 'r' }
+	elsif($stick_tracker[$stick_num]->{d}){ return 'd' }
+	elsif($stick_tracker[$stick_num]->{l}){ return 'l' }
+}
+
 #### END: SUBROUTINES ####
 
 
@@ -296,6 +311,7 @@ sub file2lines {
 #}
 
 # Non-blocking loop
+my $char_chunk = '';
 while(1){
 	my $e = $js->nextEvent;
 	if($e){
@@ -334,58 +350,118 @@ while(1){
 		# Stick handling
 		if($e->isAxis){
 			#print $e->stick . ' : ' . $e->axis . ' : ' . $e->axisValue . "\n";
-			if($e->axis == 6){ # dpad vertical
-				if($e->axisValue < 0){
-					print "DPAD UP\n";
-				}elsif($e->axisValue > 0){
-					print "DPAD DOWN\n";
+			
+			# DPAD
+			if($e->axis == 6 || $e->axis == 5){
+				if($e->axis == 6){ # dpad vertical
+					if($e->axisValue < 0){
+						#print "DPAD UP\n";
+						$stick_tracker[0]->{u} = 1;
+						$stick_tracker[0]->{d} = 0;
+					}elsif($e->axisValue > 0){
+						#print "DPAD DOWN\n";
+						$stick_tracker[0]->{d} = 1;
+						$stick_tracker[0]->{u} = 0;
+					}else{
+						$stick_tracker[0]->{u} = 0;
+						$stick_tracker[0]->{d} = 0;
+					}
 				}
-			}
-			if($e->axis == 5){ # dpad horizontal
-				if($e->axisValue < 0){
-					print "DPAD LEFT\n";
-				}elsif($e->axisValue > 0){
-					print "DPAD RIGHT\n";
+
+				if($e->axis == 5){ # dpad horizontal
+					if($e->axisValue < 0){
+						#print "DPAD LEFT\n";
+						$stick_tracker[0]->{l} = 1;
+						$stick_tracker[0]->{r} = 0;
+					}elsif($e->axisValue > 0){
+						#print "DPAD RIGHT\n";
+						$stick_tracker[0]->{l} = 0;
+						$stick_tracker[0]->{r} = 1;
+					}else{
+						$stick_tracker[0]->{l} = 0;
+						$stick_tracker[0]->{r} = 0;
+					}
 				}
+
+               			my $stick0_direction = get_stick_direction(0);
+                		if($stick0_direction){
+                        		$char_chunk = $pattern_data[$mode]->{0}->{$stick0_direction}
+                		}
 			}
 
-			if($e->axis == 1){ # analog stick 0 (left stick) vertical
-				if($e->axisValue == -32767){
-					print "STICK0 UP\n";
-				}elsif($e->axisValue == 32767){
-					print "STICK0 DOWN\n";
+			if($e->axis == 1 || $e->axis == 0){
+				if($e->axis == 1){ # analog stick 0 (left stick) vertical
+					if($e->axisValue == -32767){
+						#print "STICK0 UP\n";
+ 						$stick_tracker[1]->{u} = 1;
+                                               	$stick_tracker[1]->{d} = 0;
+					}elsif($e->axisValue == 32767){
+						#print "STICK0 DOWN\n";
+ 						$stick_tracker[1]->{u} = 0;
+                                                $stick_tracker[1]->{d} = 1;
+					}else{
+						$stick_tracker[1]->{u} = 0;
+						$stick_tracker[1]->{d} = 0;
+					}
 				}
-			}
-			if($e->axis == 0){ # analog stick 0 (left stick) horizontal
-				if($e->axisValue == -32767){
-					print "STICK0 LEFT\n";
-				}elsif($e->axisValue == 32767){
-					print "STICK0 RIGHT\n";
+				if($e->axis == 0){ # analog stick 0 (left stick) horizontal
+					if($e->axisValue == -32767){
+						#print "STICK0 LEFT\n";
+						$stick_tracker[1]->{l} = 1;
+                                                $stick_tracker[1]->{r} = 0;
+					}elsif($e->axisValue == 32767){
+						#print "STICK0 RIGHT\n";
+						$stick_tracker[1]->{l} = 0;
+                                                $stick_tracker[1]->{r} = 1;
+					}else{
+						$stick_tracker[0]->{l} = 0;
+                                                $stick_tracker[0]->{r} = 0;
+					}
+				}
+
+				my $stick1_direction = get_stick_direction(1);
+				if($stick1_direction){
+					$char_chunk = $pattern_data[$mode]->{1}->{$stick1_direction}
 				}
 			}
 
 			if($e->axis == 4){ # analog stick 1 (right stick) vertical
 				if($e->axisValue == -32767){
-					print "STICK1 UP\n";
+					#print "STICK1 UP\n";
 				}elsif($e->axisValue == 32767){
-					print "STICK1 DOWN\n";
+					#print "STICK1 DOWN\n";
 				}
 			}
 			if($e->axis == 3){ # analog stick 1 (right stick) horizontal
 				if($e->axisValue == 32767){
-					print "STICK1 RIGHT\n";
+					#print "STICK1 RIGHT\n";
 				}elsif($e->axisValue == -32767){
-					print "STICK1 LEFT\n";
+					#print "STICK1 LEFT\n";
 				}
 			}
 
 			if($e->axis == 2){ # slider
-				print "SLIDER VAL " . $e->axisValue . "\n";
+				#print "SLIDER VAL " . $e->axisValue . "\n";
 			}
 
 			#print $e->axisValue . "\n";
 			#print $e->axis . "\n";
 		}
-			
-	}
+
+		
+
+		#my $stick1_direction = get_stick_direction(1);
+		#if($stick1_direction){
+		#	$char_chunk = $pattern_data[$mode]->{1}->{$stick1_direction}
+		#}
+		
+		#my $stick2_direction = get_stick_direction(2);
+		#if($stick2_direction){
+		#	$char_chunk = $pattern_data[$mode]->{2}->{$stick2_direction}
+		#}
+
+		print "$char_chunk\n";
+					
+	} # end: event detector
+	
 }	
