@@ -11,7 +11,7 @@ use strict; use warnings;
 use Linux::Joystick;
 
 my $js = Linux::Joystick->new(
-	#threshold => 5000,
+	threshold => 2000,
 	nonblocking => 1
 );
 
@@ -311,7 +311,7 @@ sub get_stick_direction {
 #}
 
 # Non-blocking loop
-my @lines = file2lines('text/On_the_Study_of_Words-Richard_C_Trench.txt', 100);
+my @lines = file2lines('text/On_the_Study_of_Words-Richard_C_Trench.txt', 80);
 my $line_ndx = 0;
 my $char_chunk = '';
 while(1){
