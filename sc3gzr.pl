@@ -389,6 +389,7 @@ while(1){
                 		}
 			}
 
+			# ANALOG STICK 0 (LEFT)
 			if($e->axis == 1 || $e->axis == 0){
 				if($e->axis == 1){ # analog stick 0 (left stick) vertical
 					if($e->axisValue == -32767){
@@ -414,8 +415,8 @@ while(1){
 						$stick_tracker[1]->{l} = 0;
                                                 $stick_tracker[1]->{r} = 1;
 					}else{
-						$stick_tracker[0]->{l} = 0;
-                                                $stick_tracker[0]->{r} = 0;
+						$stick_tracker[1]->{l} = 0;
+                                                $stick_tracker[1]->{r} = 0;
 					}
 				}
 
@@ -425,20 +426,46 @@ while(1){
 				}
 			}
 
-			if($e->axis == 4){ # analog stick 1 (right stick) vertical
-				if($e->axisValue == -32767){
-					#print "STICK1 UP\n";
-				}elsif($e->axisValue == 32767){
-					#print "STICK1 DOWN\n";
+		
+			# ANALOG STICK 1 (RIGHT)
+			if($e->axis == 4 || $e->axis == 3){
+				if($e->axis == 4){ # analog stick 1 (right stick) vertical
+					if($e->axisValue == -32767){
+						#print "STICK1 UP\n";
+						$stick_tracker[2]->{u} = 1;	
+						$stick_tracker[2]->{d} = 0;
+					}elsif($e->axisValue == 32767){
+						#print "STICK1 DOWN\n";
+						$stick_tracker[2]->{u} = 0;
+						$stick_tracker[2]->{d} = 1;
+					}else{
+						$stick_tracker[2]->{u} = 0;
+						$stick_tracker[2]->{d} = 0;
+					}
+				}
+			
+				if($e->axis == 3){ # analog stick 1 (right stick) horizontal
+					if($e->axisValue == 32767){
+						#print "STICK1 RIGHT\n";
+						$stick_tracker[2]->{r} = 1;
+						$stick_tracker[2]->{l} = 0;
+					}elsif($e->axisValue == -32767){
+						#print "STICK1 LEFT\n";
+						$stick_tracker[2]->{r} = 0;	
+						$stick_tracker[2]->{l} = 1;
+					}else{
+						$stick_tracker[2]->{r} = 0;
+						$stick_tracker[2]->{l} = 0;
+					}
+				}
+
+				my $stick2_direction = get_stick_direction(2);
+				if($stick2_direction){
+					$char_chunk = $pattern_data[$mode]->{2}->{$stick2_direction}
 				}
 			}
-			if($e->axis == 3){ # analog stick 1 (right stick) horizontal
-				if($e->axisValue == 32767){
-					#print "STICK1 RIGHT\n";
-				}elsif($e->axisValue == -32767){
-					#print "STICK1 LEFT\n";
-				}
-			}
+
+
 
 			if($e->axis == 2){ # slider
 				#print "SLIDER VAL " . $e->axisValue . "\n";
