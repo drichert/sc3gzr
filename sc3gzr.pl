@@ -311,6 +311,8 @@ sub get_stick_direction {
 #}
 
 # Non-blocking loop
+my @lines = file2lines('text/On_the_Study_of_Words-Richard_C_Trench.txt', 100);
+my $line_ndx = 0;
 my $char_chunk = '';
 while(1){
 	my $e = $js->nextEvent;
@@ -487,7 +489,30 @@ while(1){
 		#	$char_chunk = $pattern_data[$mode]->{2}->{$stick2_direction}
 		#}
 
-		print "$char_chunk\n";
+		my $pattern = '';
+		if($anchor eq 'b'){
+			$pattern = "^$char_chunk";
+		}elsif($anchor eq 'e'){
+			$pattern = "$char_chunk".'$';
+		}else{
+			$pattern = $char_chunk;
+		}
+		
+		my @line = split /\s+/, $lines[$line_ndx];
+		foreach(@line){
+			if($_ =~ /$pattern/){ print "$_ " }
+			else{ 
+				print ' ' x (length $_)
+			}
+		}
+		print "\n";
+	
+		# Set the line index back to 0 if it's at the end, increment if not
+		if($line_ndx == $#lines){
+			$line_ndx = 0;
+		}else{
+			$line_ndx++;
+		}
 					
 	} # end: event detector
 	
