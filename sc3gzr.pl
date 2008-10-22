@@ -10,6 +10,7 @@
 use strict; use warnings;
 use Linux::Joystick;
 
+
 my $js = Linux::Joystick->new(
 	threshold => 2000,
 	nonblocking => 1
@@ -243,6 +244,7 @@ my @stick_tracker = (
 
 my $mode = 0; # initialize to a-z mode (0)
 my $anchor = 'n'; # Three possiblities for $anchor -- 'b' = beginning, 'n' = none, 'e' = end
+my $wn_mode = '';
 
 #### End: Mode selector ####
 
@@ -293,6 +295,23 @@ sub get_stick_direction {
 	elsif($stick_tracker[$stick_num]->{l}){ return 'l' }
 }
 
+sub get_rand_word_from_wn_result {
+	# Takes a comma separated list of querySense results.
+	# The wordnet querySense method normally returns 
+	# an array, but I'm too lazy/newbish to deal with referencing,
+	# so use join(',',$wn_result) then pass that to this sub.
+	
+	# split the results on comma
+	my @wn_results = split(/,/, shift(@_));
+	# pick a random result
+	my $word = $wn_results[int(rand($#wn_results + 1))];
+	# chop off the pos and sense codes
+	$word =~ m/^([^#]+)#/;
+	# replace underscores with spaces
+	$word =~ s/_/ /;
+	return $1; 
+}
+	
 #### END: SUBROUTINES ####
 
 
@@ -468,9 +487,16 @@ while(1){
 			}
 
 
-
+			# Use the slider to set wordnet transform mode
 			if($e->axis == 2){ # slider
-				#print "SLIDER VAL " . $e->axisValue . "\n";
+				# print "SLIDER VAL " . $e->axisValue . "\n";
+				if($e->axisValue < -23405){ $wn_mode = ''; }
+				elsif($e->axisValue < -14043){ $wn_mode = 'also'; }
+				elsif($e->axisValue < -4681){ $wn_mode = 'syns'; }
+				elsif($e->axisValue < 4681){ $wn_mode = 'hype'; }
+				elsif($e->axisValue < 14043){ $wn_mode = 'hypo'; }
+				elsif($e->axisValue < 23405){ $wn_mode = 'mero'; }
+				else{ $wn_mode = 'holo' }	
 			}
 
 			#print $e->axisValue . "\n";
