@@ -306,7 +306,7 @@ sub get_stick_direction {
 	elsif($stick_tracker[$stick_num]->{l}){ return 'l' }
 }
 
-sub get_rand_word_from_wn_result {
+sub get_rand_word_from_wn_results {
 	# Takes a comma separated list of querySense results.
 	# The wordnet querySense method normally returns 
 	# an array, but I'm too lazy/newbish to deal with referencing,
@@ -501,12 +501,12 @@ while(1){
 			# Use the slider to set wordnet transform mode
 			if($e->axis == 2){ # slider
 				# print "SLIDER VAL " . $e->axisValue . "\n";
-				if($e->axisValue < -23405){ $wn_mode = ''; }
-				elsif($e->axisValue < -14043){ $wn_mode = 'also'; }
-				elsif($e->axisValue < -4681){ $wn_mode = 'syns'; }
-				elsif($e->axisValue < 4681){ $wn_mode = 'hype'; }
-				elsif($e->axisValue < 14043){ $wn_mode = 'hypo'; }
-				elsif($e->axisValue < 23405){ $wn_mode = 'mero'; }
+				if($e->axisValue >= 23405 ){ $wn_mode = ''; }
+				elsif($e->axisValue >= 14044 ){ $wn_mode = 'also'; }
+				elsif($e->axisValue >= 4682 ){ $wn_mode = 'syns'; }
+				elsif($e->axisValue >= -4680 ){ $wn_mode = 'hype'; }
+				elsif($e->axisValue >= -14042 ){ $wn_mode = 'hypo'; }
+				elsif($e->axisValue >= -23404 ){ $wn_mode = 'mero'; }
 				else{ $wn_mode = 'holo' }	
 			}
 
@@ -541,7 +541,14 @@ while(1){
 				if(!$wn_mode){
 					print "$_ ";
 				}else{
-				
+					my @wn_results = $wn->querySense("$_", "$wn_mode");
+					#my @wn_results = $wn->querySense("run", "syns");
+					if(@wn_results){
+						my $wn_results = join(',',@wn_results);
+						print get_rand_word_from_wn_results($wn_results);
+					}else{
+						print "$_ ";
+					}
 				} 
 			}else{ 
 				print ' ' x (length $_)
