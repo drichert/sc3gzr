@@ -4,10 +4,17 @@
 # Dan Richert
 # 09/15/2008
 # 
+# Gamepad controlled text filter
+# 
 # Linux::Joystick :
 # http://search.cpan.org/~bwatson/Linux-Joystick-0.0.1/Joystick.pm
+#
+# WordNet::QueryData :
+# http://search.cpan.org/~jrennie/WordNet-QueryData-1.47/QueryData.pm
+
 
 use strict; use warnings;
+use WordNet::QueryData; 
 use Linux::Joystick;
 
 
@@ -15,6 +22,10 @@ my $js = Linux::Joystick->new(
 	threshold => 2000,
 	nonblocking => 1
 );
+
+print STDERR 'Loading WordNet::QueryData... ';
+my $wn = WordNet::QueryData->new;
+print "Ready.\n";
 
 #### Pattern data for stick directions ####
 
@@ -526,8 +537,13 @@ while(1){
 		
 		my @line = split /\s+/, $lines[$line_ndx];
 		foreach(@line){
-			if($_ =~ /$pattern/){ print "$_ " }
-			else{ 
+			if($_ =~ /$pattern/){ 
+				if(!$wn_mode){
+					print "$_ ";
+				}else{
+				
+				} 
+			}else{ 
 				print ' ' x (length $_)
 			}
 		}
