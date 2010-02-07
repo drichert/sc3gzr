@@ -1,6 +1,10 @@
-This directory is under version control.
+*sc3gzr*
+Gamepad Controlled Real-time Text Stream Filtering with Audio Feedback
 
-SVN URL for remote operations:
-svn+a2://phxom@matterwave.net/home/phxom/svn/sc3gzr/trunk
+Perl/Supercollider
+Requires Perl modules Linux::Joystick and Net::OpenSoundControl
 
+More information can be found at http://t.dnlr.net/articles/sc3gzr.html
+
+Photos from installation at Marmion Way, Los Angeles (November 13, 2008) can be found at http://www.flickr.com/photos/dan-richert/sets/72157623237796157/
 
